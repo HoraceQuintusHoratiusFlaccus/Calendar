@@ -56,7 +56,7 @@ private:
     QComboBox * FirstDayCombo;
     QComboBox * SelectionModeCombo;
     QCheckBox * GridCheckBox;
-    QCheckBox * navigationCheckBox;
+    QCheckBox * NavigationCheckBox;
     QComboBox * HorizontalHeaderCombo;
     QComboBox * VerticalHeaderCombo;
 
