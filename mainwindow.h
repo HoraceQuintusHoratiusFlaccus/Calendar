@@ -36,17 +36,17 @@ private slots:
     void ReformatCalendarPage();
 
 private:
-    void CreatePreviewGroupBox();
-    void CreateGeneralOptionsGroupBox();
-    void CreateDatesGroupBox();
-    void CreateTextFormatsGroupBox();
-    QComboBox * CreateColorComboBox();
+    void CreatePreviewGroup();
+    void CreateGeneralOptionsGroup();
+    void CreateDatesGroup();
+    void CreateTextFormatsGroup();
+    QComboBox * CreateColorCombo();
 
-    QGroupBox * PreviewGroupBox;
+    QGroupBox * PreviewGroup;
     QGridLayout * PreviewLayout;
     QCalendarWidget * Calendar;
 
-    QGroupBox * GeneralOptionsGroupBox;
+    QGroupBox * GeneralOptionsGroup;
     QLabel * LocaleLabel;
     QLabel * FirstDayLabel;
     QLabel * SelectionModeLabel;
@@ -55,28 +55,29 @@ private:
     QComboBox * LocaleCombo;
     QComboBox * FirstDayCombo;
     QComboBox * SelectionModeCombo;
-    QCheckBox * GridCheckBox;
-    QCheckBox * NavigationCheckBox;
+    QCheckBox * GridCheck;
+    QCheckBox * NavigationCheck;
     QComboBox * HorizontalHeaderCombo;
     QComboBox * VerticalHeaderCombo;
 
-    QGroupBox * DatesGroupBox;
-    QLabel * CurrentDateLabel;
+    QGroupBox * DatesGroup;
+    QLabel * CurDateLabel;
     QLabel * MinDateLabel;
     QLabel * MaxDateLabel;
-    QDateEdit * CurrentDateEdit;
+    QDateEdit * CurDateEdit;
     QDateEdit * MinDateEdit;
     QDateEdit * MaxDateEdit;
 
-    QGroupBox * TextFormatsGroupBox;
+    QGroupBox * TextFormatsGroup;
     QLabel * WeekdayColorLabel;
     QLabel * WeekendColorLabel;
     QLabel * HeaderTextFormatLabel;
     QComboBox * WeekdayColorCombo;
+    QComboBox * WeekendColorCombo;
     QComboBox * HeaderTextFormatCombo;
 
-    QCheckBox * FirstFirdayCheckBox;
-    QCheckBox * MayFirstCheckBox;
+    QCheckBox * FirstFridayCheck;
+    QCheckBox * MayFirstCheck;
 };
 
 #endif // MAINWINDOW_H
