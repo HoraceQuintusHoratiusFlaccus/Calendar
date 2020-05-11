@@ -6,20 +6,21 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QCheckBox>
+#include <QDateEdit>
 
 Window::Window(QWidget * Parent)
     : QWidget(Parent)
 {
-    CreatePreviewGroupBox();
-    CreateGeneralOptionsGroupBox();
-    CreateDatesGroupBox();
-    CreateTextFormatsGroupBox();
+    CreatePreviewGroup();
+    CreateGeneralOptionsGroup();
+    CreateDatesGroup();
+    CreateTextFormatsGroup();
 
     QGridLayout * Layout = new QGridLayout;
-    Layout -> addWidget(PreviewGroupBox, 0, 0);
-    Layout -> addWidget(GeneralOptionsGroupBox, 0, 1);
-    Layout -> addWidget(DatesGroupBox, 1, 0);
-    Layout -> addWidget(TextFormatsGroupBox, 1, 1);
+    Layout -> addWidget(PreviewGroup, 0, 0);
+    Layout -> addWidget(GeneralOptionsGroup, 0, 1);
+    Layout -> addWidget(DatesGroup, 1, 0);
+    Layout -> addWidget(TextFormatsGroup, 1, 1);
     Layout -> setSizeConstraint(QLayout::SetFixedSize);
     setLayout(Layout);
 
@@ -29,9 +30,9 @@ Window::Window(QWidget * Parent)
     setWindowTitle(tr("Calendar"));
 }
 
-void Window::CreatePreviewGroupBox()
+void Window::CreatePreviewGroup()
 {
-    PreviewGroupBox = new QGroupBox(tr("Preview"));
+    PreviewGroup = new QGroupBox(tr("Preview"));
 
     Calendar = new QCalendarWidget;
     Calendar -> setMinimumDate(QDate(1900, 1, 1));
@@ -43,12 +44,12 @@ void Window::CreatePreviewGroupBox()
 
     PreviewLayout = new QGridLayout;
     PreviewLayout -> addWidget(Calendar, 0, 0, Qt::AlignCenter);
-    PreviewGroupBox -> setLayout(PreviewLayout);
+    PreviewGroup -> setLayout(PreviewLayout);
 }
 
-void Window::CreateGeneralOptionsGroupBox()
+void Window::CreateGeneralOptionsGroup()
 {
-    GeneralOptionsGroupBox = new QGroupBox(tr("General Options"));
+    GeneralOptionsGroup = new QGroupBox(tr("General Options"));
 
     LocaleCombo = new QComboBox;
     int CurLocaleIndex = -1;
@@ -94,11 +95,11 @@ void Window::CreateGeneralOptionsGroupBox()
     SelectionModeLabel = new QLabel(tr("&Selection mode:"));
     SelectionModeLabel -> setBuddy(SelectionModeCombo);
 
-    GridCheckBox = new QCheckBox(tr("&Grid"));
-    GridCheckBox -> setChecked(Calendar -> isGridVisible());
+    GridCheck = new QCheckBox(tr("&Grid"));
+    GridCheck -> setChecked(Calendar -> isGridVisible());
 
-    NavigationCheckBox = new QCheckBox(tr("&Navigation bar"));
-    NavigationCheckBox -> setChecked(true);
+    NavigationCheck = new QCheckBox(tr("&Navigation bar"));
+    NavigationCheck -> setChecked(true);
 
     HorizontalHeaderCombo = new QComboBox;
     HorizontalHeaderCombo -> addItem(tr("Single letter day names"),
@@ -123,8 +124,8 @@ void Window::CreateGeneralOptionsGroupBox()
             this, &Window::FirstDayChanged);
     connect(SelectionModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &Window::SelectionModeChanged);
-    connect(GridCheckBox, &QCheckBox::toggled, Calendar, &QCalendarWidget::setGridVisible);
-    connect(NavigationCheckBox, &QCheckBox::toggled,
+    connect(GridCheck, &QCheckBox::toggled, Calendar, &QCalendarWidget::setGridVisible);
+    connect(NavigationCheck, &QCheckBox::toggled,
             Calendar, &QCalendarWidget::setNavigationBarVisible);
     connect(HorizontalHeaderCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &Window::VerticalHeaderChanged);
@@ -132,9 +133,9 @@ void Window::CreateGeneralOptionsGroupBox()
             this, &Window::VerticalHeaderChanged);
 
     QHBoxLayout * CheckBoxLayout = new QHBoxLayout;
-    CheckBoxLayout -> addWidget(GridCheckBox);
+    CheckBoxLayout -> addWidget(GridCheck);
     CheckBoxLayout -> addStretch();
-    CheckBoxLayout -> addWidget(NavigationCheckBox);
+    CheckBoxLayout -> addWidget(NavigationCheck);
 
     QGridLayout * OuterLayout = new QGridLayout;
     OuterLayout->addWidget(LocaleLabel, 0, 0);
@@ -148,10 +149,118 @@ void Window::CreateGeneralOptionsGroupBox()
     OuterLayout->addWidget(HorizontalHeaderCombo, 4, 1);
     OuterLayout->addWidget(VerticalHeaderLabel, 5, 0);
     OuterLayout->addWidget(VerticalHeaderCombo, 5, 1);
-    GeneralOptionsGroupBox->setLayout(OuterLayout);
+    GeneralOptionsGroup->setLayout(OuterLayout);
 
     FirstDayChanged(FirstDayCombo -> currentIndex());
     SelectionModeChanged(SelectionModeCombo -> currentIndex());
     HorizontalHeaderChanged(HorizontalHeaderCombo -> currentIndex());
     VerticalHeaderChanged(VerticalHeaderCombo -> currentIndex());
+}
+
+void Window::CreateDatesGroup()
+{
+    DatesGroup = new QGroupBox(tr("Dates"));
+
+    MinDateEdit = new QDateEdit;
+    MinDateEdit -> setDisplayFormat("MMM d yyyy");
+    MinDateEdit -> setDateRange(Calendar -> minimumDate(), Calendar -> maximumDate());
+    MinDateEdit -> setDate(Calendar -> minimumDate());
+
+    MinDateLabel = new QLabel(tr("&Minimum Date:"));
+    MinDateLabel -> setBuddy(MinDateEdit);
+
+    CurDateEdit = new QDateEdit;
+    CurDateEdit -> setDisplayFormat("MMM d yyyy");
+    CurDateEdit -> setDate(Calendar -> selectedDate());
+    CurDateEdit -> setDateRange(Calendar -> minimumDate(), Calendar -> maximumDate());
+
+    CurDateLabel = new QLabel(tr("&Current Date:"));
+    CurDateLabel -> setBuddy(CurDateEdit);
+
+    MaxDateEdit = new QDateEdit;
+    MaxDateEdit -> setDisplayFormat("MMM d yyyy");
+    MaxDateEdit -> setDateRange(Calendar -> minimumDate(), Calendar -> maximumDate());
+    MaxDateEdit -> setDate(Calendar -> maximumDate());
+
+    MaxDateLabel = new QLabel(tr("Ma&ximum Date:"));
+    MaxDateLabel -> setBuddy(MaxDateEdit);
+
+    connect(CurDateEdit, &QDateEdit::dateChanged, Calendar, &QCalendarWidget::setSelectedDate);
+    connect(Calendar, &QCalendarWidget::selectionChanged, this, &Window::SelectedDateChanged);
+    connect(MinDateEdit, &QDateEdit::dateChanged, this, &Window::MinDateChanged);
+    connect(MaxDateEdit, &QDateEdit::dateChanged, this, &Window::MaxDateChanged);
+
+    QGridLayout * DateBoxLayout = new QGridLayout;
+    DateBoxLayout -> addWidget(CurDateLabel, 1, 0);
+    DateBoxLayout -> addWidget(CurDateEdit, 1, 1);
+    DateBoxLayout -> addWidget(MinDateLabel, 0, 0);
+    DateBoxLayout -> addWidget(MinDateEdit, 0, 1);
+    DateBoxLayout -> addWidget(MaxDateLabel, 2, 0);
+    DateBoxLayout -> addWidget(MaxDateEdit, 2, 1);
+    DateBoxLayout -> setRowStretch(3, 1);
+
+    DatesGroup -> setLayout(DateBoxLayout);
+}
+
+void Window::CreateTextFormatsGroup()
+{
+    TextFormatsGroup = new QGroupBox(tr("Text Formats"));
+
+    WeekdayColorCombo = CreateColorCombo();
+    WeekdayColorCombo -> setCurrentIndex(WeekdayColorCombo -> findText(tr("Black")));
+
+    WeekdayColorLabel = new QLabel(tr("&Weekday color:"));
+    WeekdayColorLabel -> setBuddy(WeekdayColorCombo);
+
+    WeekendColorCombo = CreateColorCombo();
+    WeekendColorCombo -> setCurrentIndex(WeekendColorCombo -> findText(tr("Red")));
+
+    WeekendColorLabel = new QLabel(tr("Week&end color:"));
+    WeekendColorLabel -> setBuddy(WeekendColorCombo);
+
+    HeaderTextFormatCombo = new QComboBox;
+    HeaderTextFormatCombo -> addItem(tr("Bold"));
+    HeaderTextFormatCombo -> addItem(tr("Italic"));
+    HeaderTextFormatCombo -> addItem(tr("Plain"));
+
+    HeaderTextFormatLabel = new QLabel(tr("&Header text:"));
+    HeaderTextFormatLabel -> setBuddy(HeaderTextFormatCombo);
+
+    FirstFridayCheck = new QCheckBox(tr("&FirstFriday in blue"));
+
+    MayFirstCheck = new QCheckBox(tr("May &1 in red"));
+
+    connect(WeekdayColorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::WeekdayFormatChanged);
+    connect(WeekdayColorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::ReformatCalendarPage);
+    connect(WeekendColorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::WeekendFormatChanged);
+    connect(WeekendColorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::ReformatCalendarPage);
+    connect(HeaderTextFormatCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &Window::ReformatHeaders);
+    connect(FirstFridayCheck, &QCheckBox::toggled, this, &Window::ReformatCalendarPage);
+    connect(MayFirstCheck, &QCheckBox::toggled, this, &Window::ReformatCalendarPage);
+
+    QHBoxLayout * CheckBoxLayout = new QHBoxLayout;
+    CheckBoxLayout -> addWidget(FirstFridayCheck);
+    CheckBoxLayout -> addStretch();
+    CheckBoxLayout -> addWidget(MayFirstCheck);
+
+    QGridLayout * OuterLayout = new QGridLayout;
+    OuterLayout -> addWidget(WeekdayColorLabel, 0, 0);
+    OuterLayout -> addWidget(WeekdayColorCombo, 0, 1);
+    OuterLayout -> addWidget(WeekendColorLabel, 1, 0);
+    OuterLayout -> addWidget(WeekendColorCombo, 1, 1);
+    OuterLayout -> addWidget(HeaderTextFormatLabel, 2, 0);
+    OuterLayout -> addWidget(HeaderTextFormatCombo, 2, 1);
+    OuterLayout -> addLayout(CheckBoxLayout, 3, 0, 1, 2);
+    TextFormatsGroup -> setLayout(OuterLayout);
+
+    WeekdayFormatChanged();
+    WeekendFormatChanged();
+
+    ReformatHeaders();
+    ReformatCalendarPage();
 }
